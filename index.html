@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuestionario Valoración e Inserción Laboral — IES El Pla</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f5f4f0; color: #1a1a18; font-size: 15px; line-height: 1.6; }
+  .page { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem 3rem; }
+  .doc-header { background: #fff; border: 0.5px solid #ddd; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+  .doc-header h1 { font-size: 17px; font-weight: 600; color: #1a1a18; margin-bottom: 4px; }
+  .doc-header p { font-size: 13px; color: #666; margin-bottom: 1rem; }
+  .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .meta-field label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #888; margin-bottom: 4px; }
+  .meta-field input { width: 100%; border: 0.5px solid #ccc; border-radius: 8px; padding: 8px 10px; font-size: 14px; font-family: inherit; background: #fafaf8; color: #1a1a18; }
+  .meta-field input:focus { outline: none; border-color: #534AB7; box-shadow: 0 0 0 2px rgba(83,74,183,0.12); }
+  .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #534AB7; margin: 1.75rem 0 0.75rem; padding-bottom: 6px; border-bottom: 1.5px solid #EEEDFE; }
+  .q-block { background: #fff; border: 0.5px solid #e8e8e4; border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 10px; }
+  .q-label { font-size: 14px; color: #1a1a18; margin-bottom: 10px; }
+  .q-num { font-weight: 600; color: #534AB7; margin-right: 4px; }
+  .q-hint { font-size: 13px; color: #888; font-style: italic; }
+  .score-row { display: flex; gap: 6px; align-items: center; }
+  .score-row input[type=radio] { display: none; }
+  .score-row label { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 0.5px solid #ccc; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; color: #888; transition: all 0.1s; }
+  .score-row input[type=radio]:checked + label { background: #EEEDFE; color: #3C3489; border-color: #AFA9EC; font-weight: 600; }
+  .score-row label:hover { background: #f5f4f0; color: #534AB7; border-color: #AFA9EC; }
+  .score-legend { display: flex; justify-content: space-between; font-size: 11px; color: #aaa; margin-top: 4px; padding: 0 2px; }
+  textarea { width: 100%; min-height: 80px; border: 0.5px solid #ccc; border-radius: 8px; padding: 10px 12px; font-size: 14px; resize: vertical; font-family: inherit; background: #fafaf8; color: #1a1a18; }
+  textarea:focus { outline: none; border-color: #534AB7; box-shadow: 0 0 0 2px rgba(83,74,183,0.12); }
+  .radio-group { display: flex; flex-direction: column; gap: 8px; }
+  .radio-group.inline { flex-direction: row; gap: 16px; }
+  .radio-option { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; cursor: pointer; }
+  .radio-option input { margin-top: 3px; accent-color: #534AB7; cursor: pointer; flex-shrink: 0; }
+  .conditional { display: none; background: #fafaf8; border-left: 2px solid #AFA9EC; border-radius: 0 10px 10px 0; padding: 1rem 1rem 0.5rem; margin: 8px 0 10px; }
+  .conditional.visible { display: block; }
+  .actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 2rem; }
+  .btn-pdf { background: #534AB7; color: #fff; border: none; border-radius: 8px; padding: 11px 28px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 8px; }
+  .btn-pdf:hover { background: #3C3489; }
+  .btn-reset { background: transparent; color: #888; border: 0.5px solid #ccc; border-radius: 8px; padding: 11px 20px; font-size: 14px; cursor: pointer; font-family: inherit; }
+  .btn-reset:hover { background: #f5f4f0; }
+  .toast { display: none; background: #1D9E75; color: #fff; border-radius: 8px; padding: 12px 20px; font-size: 14px; font-weight: 500; margin-top: 12px; text-align: center; }
+  @media (max-width: 560px) { .meta-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="doc-header">
+    <h1>Cuestionario de valoración e inserción laboral</h1>
+    <p>Formación en empresa — A cumplimentar por el tutor/a de empresa</p>
+    <div class="meta-grid">
+      <div class="meta-field">
+        <label>Centro educativo</label>
+        <input type="text" id="m_centro" value="IES EL PLA">
+      </div>
+      <div class="meta-field">
+        <label>Tutor/a del centro</label>
+        <input type="text" id="m_tutor" placeholder="Nombre del tutor/a">
+      </div>
+      <div class="meta-field">
+        <label>Alumno/a</label>
+        <input type="text" id="m_alumno" placeholder="Nombre del alumno/a">
+      </div>
+      <div class="meta-field">
+        <label>Empresa</label>
+        <input type="text" id="m_empresa" placeholder="Nombre de la empresa">
+      </div>
+      <div class="meta-field">
+        <label>Ciclo formativo</label>
+        <input type="text" id="m_ciclo" placeholder="Nombre del ciclo formativo">
+      </div>
+      <div class="meta-field">
+        <label>Año escolar</label>
+        <input type="text" id="m_anyo" placeholder="Ej: 2024-2025">
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Valoración cualitativa del tutor de empresa</div>
+
+  <div class="q-block">
+    <div class="q-label"><span class="q-num">1)</span> Valoración de la actitud del alumnado durante su periodo en la empresa <span class="q-hint">(puntualidad, iniciativa, responsabilidad...)</span></div>
+    <div class="score-row">
+      <input type="radio" name="p1" id="p1_0" value="0"><label for="p1_0">0</label>
+      <input type="radio" name="p1" id="p1_1" value="1"><label for="p1_1">1</label>
+      <input type="radio" name="p1" id="p1_2" value="2"><label for="p1_2">2</label>
+      <input type="radio" name="p1" id="p1_3" value="3"><label for="p1_3">3</label>
+      <input type="radio" name="p1" id="p1_4" value="4"><label for="p1_4">4</label>
+      <input type="radio" name="p1" id="p1_5" value="5"><label for="p1_5">5</label>
+    </div>
+    <div class="score-legend"><span>Insuficiente</span><span>Excelente</span></div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label"><span class="q-num">2)</span> Valoración del seguimiento realizado por el tutor del centro educativo</div>
+    <div class="score-row">
+      <input type="radio" name="p2" id="p2_0" value="0"><label for="p2_0">0</label>
+      <input type="radio" name="p2" id="p2_1" value="1"><label for="p2_1">1</label>
+      <input type="radio" name="p2" id="p2_2" value="2"><label for="p2_2">2</label>
+      <input type="radio" name="p2" id="p2_3" value="3"><label for="p2_3">3</label>
+      <input type="radio" name="p2" id="p2_4" value="4"><label for="p2_4">4</label>
+      <input type="radio" name="p2" id="p2_5" value="5"><label for="p2_5">5</label>
+    </div>
+    <div class="score-legend"><span>Insuficiente</span><span>Excelente</span></div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label"><span class="q-num">3)</span> Valoración general del desarrollo de la formación</div>
+    <div class="score-row">
+      <input type="radio" name="p3" id="p3_0" value="0"><label for="p3_0">0</label>
+      <input type="radio" name="p3" id="p3_1" value="1"><label for="p3_1">1</label>
+      <input type="radio" name="p3" id="p3_2" value="2"><label for="p3_2">2</label>
+      <input type="radio" name="p3" id="p3_3" value="3"><label for="p3_3">3</label>
+      <input type="radio" name="p3" id="p3_4" value="4"><label for="p3_4">4</label>
+      <input type="radio" name="p3" id="p3_5" value="5"><label for="p3_5">5</label>
+    </div>
+    <div class="score-legend"><span>Insuficiente</span><span>Excelente</span></div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label"><span class="q-num">4)</span> Aspectos positivos <span class="q-hint">(destaque, al menos, un aspecto positivo de su participación en el proceso de formación)</span></div>
+    <textarea id="p4" placeholder="Indique los aspectos positivos…"></textarea>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label"><span class="q-num">5)</span> Propuestas de mejora <span class="q-hint">(indique, al menos, una propuesta respecto al proceso de formación del alumnado)</span></div>
+    <textarea id="p5" placeholder="Indique las propuestas de mejora…"></textarea>
+  </div>
+
+  <div class="section-title">Valoración cuantitativa sobre la inserción laboral</div>
+
+  <div class="q-block">
+    <div class="q-label"><span class="q-num">6)</span> ¿Se le ha ofrecido al alumno la posibilidad de mantener una relación laboral con la empresa/organismo?</div>
+    <div class="radio-group inline">
+      <label class="radio-option"><input type="radio" name="p6" value="si" onchange="sync()"> Sí</label>
+      <label class="radio-option"><input type="radio" name="p6" value="no" onchange="sync()"> No</label>
+    </div>
+  </div>
+
+  <div class="conditional" id="blk_no6">
+    <div class="q-block" style="margin-bottom:0; border:none; padding:0; background:transparent;">
+      <div class="q-label"><span class="q-num">7)</span> En caso de NO en la pregunta 6 ¿Por qué motivo?</div>
+      <div class="radio-group">
+        <label class="radio-option"><input type="radio" name="p7" value="a"> a) Actualmente no hay necesidad de contratación, pero se tendría en cuenta al alumno/a para futuros puestos.</label>
+        <label class="radio-option"><input type="radio" name="p7" value="b"> b) El alumno/a no presenta las habilidades y capacidades suficientes para optar a un puesto correspondiente a su perfil.</label>
+        <label class="radio-option"><input type="radio" name="p7" value="c"> c) Se trata de un organismo público en el que no es posible la contratación directa.</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="conditional" id="blk_si6">
+    <div class="q-block" style="margin-bottom:10px; border:none; padding:0; background:transparent;">
+      <div class="q-label"><span class="q-num">8)</span> En caso de SÍ en la pregunta 6 ¿Qué tipo de contrato?</div>
+      <div class="radio-group">
+        <label class="radio-option"><input type="radio" name="p8" value="a"> a) Contratación laboral indefinida</label>
+        <label class="radio-option"><input type="radio" name="p8" value="b"> b) Contratación temporal</label>
+      </div>
+    </div>
+    <div class="q-block" style="margin-bottom:0; border:none; padding:0; background:transparent;">
+      <div class="q-label"><span class="q-num">9)</span> En caso de SÍ en la pregunta 6 ¿Ha aceptado el alumno la oferta?</div>
+      <div class="radio-group inline">
+        <label class="radio-option"><input type="radio" name="p9" value="si" onchange="sync()"> Sí</label>
+        <label class="radio-option"><input type="radio" name="p9" value="no" onchange="sync()"> No</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="conditional" id="blk_no9">
+    <div class="q-block" style="margin-bottom:10px; border:none; padding:0; background:transparent;">
+      <div class="q-label"><span class="q-num">10)</span> En caso de NO en la pregunta 9 ¿Por qué motivo?</div>
+      <div class="radio-group">
+        <label class="radio-option"><input type="radio" name="p10" value="a" onchange="sync()"> a) No le interesan las condiciones</label>
+        <label class="radio-option"><input type="radio" name="p10" value="b" onchange="sync()"> b) Desea seguir estudiando y no puede compaginar</label>
+        <label class="radio-option"><input type="radio" name="p10" value="c" onchange="sync()"> c) Otros</label>
+      </div>
+    </div>
+    <div class="conditional" id="blk_otros10">
+      <div class="q-label"><span class="q-num">11)</span> Detalle del motivo "Otros" en pregunta 10</div>
+      <textarea id="p11" placeholder="Detalle el motivo…"></textarea>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label"><span class="q-num">12)</span> ¿Recomendaría a otra empresa/institución la contratación del alumno/a?</div>
+    <div class="radio-group inline">
+      <label class="radio-option"><input type="radio" name="p12" value="si" onchange="sync()"> Sí</label>
+      <label class="radio-option"><input type="radio" name="p12" value="no" onchange="sync()"> No</label>
+    </div>
+  </div>
+
+  <div class="conditional" id="blk_no12">
+    <div class="q-block" style="border:none; padding:0; background:transparent;">
+      <div class="q-label"><span class="q-num">13)</span> En caso de NO en la pregunta 12 ¿Por qué motivo?</div>
+      <textarea id="p13" placeholder="Indique el motivo…"></textarea>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-reset" onclick="resetForm()">Limpiar</button>
+    <button class="btn-pdf" onclick="generarPDF()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Descargar PDF
+    </button>
+  </div>
+  <div class="toast" id="toast">✓ PDF generado correctamente</div>
+
+</div>
+
+<script>
+function sync() {
+  var p6  = document.querySelector('input[name="p6"]:checked');
+  var p9  = document.querySelector('input[name="p9"]:checked');
+  var p10 = document.querySelector('input[name="p10"]:checked');
+  var p12 = document.querySelector('input[name="p12"]:checked');
+  toggle('blk_no6',    p6  && p6.value  === 'no');
+  toggle('blk_si6',    p6  && p6.value  === 'si');
+  toggle('blk_no9',    p9  && p9.value  === 'no');
+  toggle('blk_otros10',p10 && p10.value === 'c');
+  toggle('blk_no12',   p12 && p12.value === 'no');
+}
+function toggle(id, show) {
+  document.getElementById(id).classList[show ? 'add' : 'remove']('visible');
+}
+function val(name) {
+  var el = document.querySelector('input[name="' + name + '"]:checked');
+  return el ? el.value : null;
+}
+function txt(id) {
+  var el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+function resetForm() {
+  document.querySelectorAll('input[type=radio]').forEach(r => r.checked = false);
+  document.querySelectorAll('textarea').forEach(t => t.value = '');
+  sync();
+}
+
+function recogerDatos() {
+  return {
+    meta: {
+      centro:  txt('m_centro'),
+      tutor:   txt('m_tutor'),
+      alumno:  txt('m_alumno'),
+      empresa: txt('m_empresa'),
+      ciclo:   txt('m_ciclo'),
+      anyo:    txt('m_anyo'),
+      fecha_generacion: new Date().toISOString()
+    },
+    cualitativa: {
+      p1_actitud_alumno:        val('p1'),
+      p2_seguimiento_tutor:     val('p2'),
+      p3_valoracion_general:    val('p3'),
+      p4_aspectos_positivos:    txt('p4'),
+      p5_propuestas_mejora:     txt('p5')
+    },
+    insercion_laboral: {
+      p6_oferta_laboral:        val('p6'),
+      p7_motivo_no_oferta:      val('p7'),
+      p8_tipo_contrato:         val('p8'),
+      p9_acepta_oferta:         val('p9'),
+      p10_motivo_no_acepta:     val('p10'),
+      p11_motivo_otros:         txt('p11'),
+      p12_recomendaria:         val('p12'),
+      p13_motivo_no_recomienda: txt('p13')
+    }
+  };
+}
+
+function generarPDF() {
+  var { jsPDF } = window.jspdf;
+  var datos = recogerDatos();
+  var jsonStr = JSON.stringify(datos);
+
+  var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+  // ── Incrustar JSON en metadatos del PDF ──────────────────────────────────
+  doc.setProperties({
+    title:   'Cuestionario FCT — ' + datos.meta.alumno,
+    subject: 'Valoracion e insercion laboral',
+    author:  datos.meta.centro,
+    keywords: 'FCT_JSON:' + jsonStr,
+    creator: 'IES El Pla — Formulario FCT'
+  });
+
+  // ── Renderizado visual del PDF ───────────────────────────────────────────
+  var pageW = 210, margin = 18, contentW = pageW - margin * 2;
+  var y = 20, lineH = 6;
+
+  function checkPage(needed) {
+    if (y + needed > 275) { doc.addPage(); y = 20; }
+  }
+  function sectionTitle(text) {
+    checkPage(12);
+    doc.setFillColor(238, 237, 254);
+    doc.rect(margin, y, contentW, 8, 'F');
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(60, 52, 137);
+    doc.text(text.toUpperCase(), margin + 3, y + 5.5);
+    y += 11; doc.setTextColor(26, 26, 24);
+  }
+  function metaRow(label, value) {
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(120,120,110);
+    doc.text(label + ':', margin, y);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(26,26,24);
+    doc.text(value || '—', margin + 38, y);
+    y += lineH;
+  }
+  function question(num, label, answer, isScore) {
+    checkPage(20);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(83,74,183);
+    doc.text(num + ')', margin, y);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(60,60,55);
+    var wrapped = doc.splitTextToSize(label, contentW - 10);
+    doc.text(wrapped, margin + 7, y);
+    y += wrapped.length * lineH - 1;
+    if (isScore) {
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.setTextColor(83,74,183);
+      doc.text(answer != null ? answer + ' / 5' : 'Sin respuesta', margin + 7, y + 1);
+      y += 8;
+    } else {
+      checkPage(8);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(26,26,24);
+      var lines = doc.splitTextToSize(answer || '—', contentW - 10);
+      lines.forEach(function(line) { checkPage(6); doc.text(line, margin + 7, y); y += lineH; });
+    }
+    y += 3;
+    doc.setDrawColor(220,220,215); doc.setLineWidth(0.3);
+    doc.line(margin, y - 1, margin + contentW, y - 1);
+    y += 3;
+  }
+
+  var labP7 = { a: 'a) No hay necesidad de contratación, pero se tendría en cuenta para futuros puestos', b: 'b) El alumno/a no presenta las habilidades suficientes', c: 'c) Organismo público — contratación directa no posible' };
+  var labP8 = { a: 'a) Contratación laboral indefinida', b: 'b) Contratación temporal' };
+  var labP10 = { a: 'a) No le interesan las condiciones', b: 'b) Desea seguir estudiando y no puede compaginar', c: 'c) Otros' };
+  var labSiNo = { si: 'Sí', no: 'No' };
+
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.setTextColor(83,74,183);
+  doc.text('Cuestionario de valoración e inserción laboral', margin, y); y += 7;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(120,120,110);
+  doc.text('Formación en empresa — Cumplimentado por el tutor/a de empresa', margin, y); y += 10;
+  doc.setDrawColor(175,169,236); doc.setLineWidth(0.5);
+  doc.line(margin, y, margin + contentW, y); y += 8;
+
+  metaRow('Centro',         datos.meta.centro);
+  metaRow('Tutor/a centro', datos.meta.tutor);
+  metaRow('Alumno/a',       datos.meta.alumno);
+  metaRow('Empresa',        datos.meta.empresa);
+  metaRow('Ciclo formativo',datos.meta.ciclo);
+  metaRow('Año escolar',    datos.meta.anyo);
+  y += 4;
+
+  sectionTitle('Valoración cualitativa del tutor de empresa');
+  question('1', 'Valoración de la actitud del alumnado (puntualidad, iniciativa, responsabilidad...)', datos.cualitativa.p1_actitud_alumno, true);
+  question('2', 'Valoración del seguimiento realizado por el tutor del centro educativo',              datos.cualitativa.p2_seguimiento_tutor, true);
+  question('3', 'Valoración general del desarrollo de la formación',                                  datos.cualitativa.p3_valoracion_general, true);
+  question('4', 'Aspectos positivos',    datos.cualitativa.p4_aspectos_positivos, false);
+  question('5', 'Propuestas de mejora',  datos.cualitativa.p5_propuestas_mejora,  false);
+
+  sectionTitle('Valoración cuantitativa sobre la inserción laboral');
+  var d = datos.insercion_laboral;
+  question('6', '¿Se le ha ofrecido al alumno mantener una relación laboral?', labSiNo[d.p6_oferta_laboral] || '—', false);
+  if (d.p6_oferta_laboral === 'no') question('7', 'Motivo de no oferta laboral', labP7[d.p7_motivo_no_oferta] || '—', false);
+  if (d.p6_oferta_laboral === 'si') {
+    question('8', 'Tipo de contrato ofrecido', labP8[d.p8_tipo_contrato] || '—', false);
+    question('9', '¿Ha aceptado el alumno la oferta?', labSiNo[d.p9_acepta_oferta] || '—', false);
+    if (d.p9_acepta_oferta === 'no') {
+      question('10', 'Motivo de rechazo de la oferta', labP10[d.p10_motivo_no_acepta] || '—', false);
+      if (d.p10_motivo_no_acepta === 'c') question('11', 'Detalle del motivo "Otros"', d.p11_motivo_otros, false);
+    }
+  }
+  question('12', '¿Recomendaría la contratación del alumno/a?', labSiNo[d.p12_recomendaria] || '—', false);
+  if (d.p12_recomendaria === 'no') question('13', 'Motivo de no recomendación', d.p13_motivo_no_recomienda, false);
+
+  checkPage(20); y += 6;
+  doc.setDrawColor(175,169,236); doc.setLineWidth(0.5);
+  doc.line(margin, y, margin + contentW, y); y += 8;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(120,120,110);
+  doc.text('Firma del tutor/a de empresa:', margin, y); y += 14;
+  doc.setDrawColor(200,200,195); doc.setLineWidth(0.4);
+  doc.line(margin, y, margin + 70, y);
+  doc.text('Fecha: _____ / _____ / _______', margin + 90, y);
+
+  var nombre = (datos.meta.alumno || 'cuestionario').replace(/\s+/g, '_');
+  doc.save('Cuestionario_FCT_' + nombre + '.pdf');
+
+  var toast = document.getElementById('toast');
+  toast.style.display = 'block';
+  setTimeout(function() { toast.style.display = 'none'; }, 3000);
+}
+</script>
+</body>
+</html>
