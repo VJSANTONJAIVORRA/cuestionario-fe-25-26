@@ -49,7 +49,8 @@
 
   <div class="doc-header">
     <h1>Cuestionario de valoración e inserción laboral</h1>
-    <p>Formación en empresa — A cumplimentar por el tutor/a de empresa</p>
+    <p style="font-size:14px; color:#444; line-height:1.6; margin-bottom:1rem; padding:10px 12px; background:#EEEDFE; border-radius:8px; border-left:3px solid #534AB7;">Este es un formulario estadístico cuyo objetivo es poder valorar de una manera más adecuada el desempeño del alumno, el tutor y la formación en empresa. Le agradecemos su colaboración de antemano.</p>
+    <p style="font-size:13px; color:#888; margin-bottom:1rem;">A cumplimentar por el tutor/a de empresa</p>
     <div class="meta-grid">
       <div class="meta-field">
         <label>Centro educativo</label>
@@ -197,6 +198,14 @@
     </div>
   </div>
 
+  <div class="q-block" style="margin-top:1.5rem;">
+    <div class="q-label" style="font-weight:500;">Datos de quien cumplimenta el formulario</div>
+    <div class="meta-field" style="margin-top:8px;">
+      <label>Nombre del instructor/a de empresa</label>
+      <input type="text" id="m_instructor" placeholder="Nombre completo del instructor/a">
+    </div>
+  </div>
+
   <div class="actions">
     <button class="btn-reset" onclick="resetForm()">Limpiar</button>
     <button class="btn-pdf" onclick="generarPDF()">
@@ -243,9 +252,10 @@ function recogerDatos() {
       centro:  txt('m_centro'),
       tutor:   txt('m_tutor'),
       alumno:  txt('m_alumno'),
-      empresa: txt('m_empresa'),
-      ciclo:   txt('m_ciclo'),
-      anyo:    txt('m_anyo'),
+      empresa:    txt('m_empresa'),
+      ciclo:      txt('m_ciclo'),
+      anyo:       txt('m_anyo'),
+      instructor: txt('m_instructor'),
       fecha_generacion: new Date().toISOString()
     },
     cualitativa: {
@@ -348,6 +358,7 @@ function generarPDF() {
   metaRow('Empresa',        datos.meta.empresa);
   metaRow('Ciclo formativo',datos.meta.ciclo);
   metaRow('Año escolar',    datos.meta.anyo);
+  metaRow('Instructor/a',   datos.meta.instructor);
   y += 4;
 
   sectionTitle('Valoración cualitativa del tutor de empresa');
