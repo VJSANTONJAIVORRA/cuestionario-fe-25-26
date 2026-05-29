@@ -384,6 +384,17 @@ function generarPDF() {
 
 
 
+  // ── Pie con fecha y hora de generación ──────────────────────────────────
+  var ahora = new Date();
+  var fechaHora = ahora.toLocaleDateString('es-ES', {day:'2-digit', month:'2-digit', year:'numeric'})
+                + '  '
+                + ahora.toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
+  checkPage(12); y += 8;
+  doc.setDrawColor(175,169,236); doc.setLineWidth(0.3);
+  doc.line(margin, y, margin + contentW, y); y += 6;
+  doc.setFont('helvetica', 'italic'); doc.setFontSize(8.5); doc.setTextColor(160,160,150);
+  doc.text('Documento generado el ' + fechaHora, margin, y);
+
   var nombre = (datos.meta.alumno || 'cuestionario').replace(/\s+/g, '_');
   doc.save('Cuestionario_FCT_' + nombre + '.pdf');
 
