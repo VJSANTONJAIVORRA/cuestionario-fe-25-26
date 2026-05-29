@@ -353,7 +353,6 @@ function generarPDF() {
   doc.line(margin, y, margin + contentW, y); y += 8;
 
   metaRow('Centro',         datos.meta.centro);
-  metaRow('Tutor/a centro', datos.meta.tutor);
   metaRow('Alumno/a',       datos.meta.alumno);
   metaRow('Empresa',        datos.meta.empresa);
   metaRow('Ciclo formativo',datos.meta.ciclo);
@@ -383,14 +382,7 @@ function generarPDF() {
   question('12', '¿Recomendaría la contratación del alumno/a?', labSiNo[d.p12_recomendaria] || '—', false);
   if (d.p12_recomendaria === 'no') question('13', 'Motivo de no recomendación', d.p13_motivo_no_recomienda, false);
 
-  checkPage(20); y += 6;
-  doc.setDrawColor(175,169,236); doc.setLineWidth(0.5);
-  doc.line(margin, y, margin + contentW, y); y += 8;
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(120,120,110);
-  doc.text('Firma del tutor/a de empresa:', margin, y); y += 14;
-  doc.setDrawColor(200,200,195); doc.setLineWidth(0.4);
-  doc.line(margin, y, margin + 70, y);
-  doc.text('Fecha: _____ / _____ / _______', margin + 90, y);
+
 
   var nombre = (datos.meta.alumno || 'cuestionario').replace(/\s+/g, '_');
   doc.save('Cuestionario_FCT_' + nombre + '.pdf');
